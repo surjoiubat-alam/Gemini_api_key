@@ -1,0 +1,37 @@
+name: Daily Automated AI Email Bot
+
+on:
+  schedule:
+    # UTC সময় রাত ৩:০০ টা = বাংলাদেশ সময় সকাল ৯:০০ টা (Cron Format)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # এর মাধ্যমে আপনি চাইলে গিটহাব ড্যাশবোর্ড থেকে ম্যানুয়ালি ক্লিক করেও টেস্ট করতে পারবেন
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Python Script
+      env:
+        # গিটহাব সিক্রেটস থেকে ডাটা নিয়ে এনভায়রনমেন্ট ভেরিয়েবলে সেট করা
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+        RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+      run: python script.py
